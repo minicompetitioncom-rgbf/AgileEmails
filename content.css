@@ -1,0 +1,90 @@
+/* Styles for Gmail integration */
+.agileemails-badge {
+  display: inline-block;
+  padding: 2px 6px;
+  margin-left: 8px;
+  font-size: 10px;
+  font-weight: bold;
+  border-radius: 3px;
+  color: white;
+  vertical-align: middle;
+}
+
+/* Priority color borders */
+tr[role="row"] {
+  transition: border-left 0.2s ease;
+}
+
+/* DND mode styling */
+tr[role="row"].agileemails-dnd {
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+/* Thread summary popup */
+.agileemails-summary-popup {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: 350px;
+  max-height: 400px;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  z-index: 10000;
+  padding: 16px;
+  overflow-y: auto;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.agileemails-summary-popup h3 {
+  margin: 0 0 12px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+.agileemails-summary-popup .info-section {
+  margin-bottom: 16px;
+}
+
+.agileemails-summary-popup .info-section h4 {
+  margin: 0 0 8px 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: #666;
+}
+
+.agileemails-summary-popup .info-item {
+  padding: 4px 0;
+  font-size: 12px;
+  color: #444;
+}
+
+.agileemails-summary-popup .info-item a {
+  color: #1a73e8;
+  text-decoration: none;
+}
+
+.agileemails-summary-popup .info-item a:hover {
+  text-decoration: underline;
+}
+
+.agileemails-summary-popup .close-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: #666;
+  padding: 4px 8px;
+}
+
+.agileemails-summary-popup .close-btn:hover {
+  color: #333;
+}
+
+
