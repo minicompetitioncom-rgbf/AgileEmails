@@ -1,31 +1,22 @@
 {
-  "version": 2,
-  "builds": [
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "rewrites": [
     {
-      "src": "website-new/**",
-      "use": "@vercel/static"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/privacy-policy",
-      "dest": "/website-new/privacy-policy.html"
+      "source": "/",
+      "destination": "/website-new/index.html"
     },
     {
-      "src": "/terms-of-service",
-      "dest": "/website-new/terms-of-service.html"
+      "source": "/privacy-policy",
+      "destination": "/website-new/privacy-policy.html"
     },
     {
-      "src": "/",
-      "dest": "/website-new/index.html"
+      "source": "/terms-of-service",
+      "destination": "/website-new/terms-of-service.html"
     },
     {
-      "src": "/(.*\\.(html|css|js))",
-      "dest": "/website-new/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/website-new/$1"
+      "source": "/:path*",
+      "destination": "/website-new/:path*"
     }
   ]
 }
