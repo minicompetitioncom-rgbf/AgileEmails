@@ -1,4 +1,12 @@
 // Content script for Gmail integration
+// Prevent multiple initializations
+if (window.agileEmailsInitialized) {
+  console.warn('AgileEmails: Script already initialized, skipping duplicate load');
+  // Stop execution if already initialized
+  throw new Error('AgileEmails already initialized');
+}
+window.agileEmailsInitialized = true;
+
 let classifier;
 let emailCache = new Map();
 let processedEmails = new Set();
@@ -14,7 +22,16 @@ try {
   console.error('AgileEmails: Failed to initialize classifier', e);
 }
 
+let initCalled = false;
+
 function init() {
+  // Prevent multiple initializations
+  if (initCalled) {
+    console.warn('AgileEmails: init() already called, skipping');
+    return;
+  }
+  initCalled = true;
+  
   if (!classifier) {
     console.error('AgileEmails: Classifier not available');
     return;
@@ -924,6 +941,9 @@ function highlightEmail(emailId) {
   }
 }
 
-// Initialize
-init();
+// Initialize only once
+if (!window.agileEmailsInitStarted) {
+  window.agileEmailsInitStarted = true;
+  init();
+}
 
