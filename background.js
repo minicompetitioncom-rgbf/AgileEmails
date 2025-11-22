@@ -5,11 +5,24 @@
 
 // Create main periodic alarm safely in MV3
 async function scheduleProcessEmailsAlarm() {
+  // Check if chrome.alarms API is available
+  if (!chrome || !chrome.alarms || typeof chrome.alarms.create !== 'function') {
+    console.warn('AgileEmails: chrome.alarms API not available, retrying...');
+    // Retry after a short delay
+    setTimeout(() => {
+      if (chrome && chrome.alarms && typeof chrome.alarms.create === 'function') {
+        scheduleProcessEmailsAlarm();
+      }
+    }, 1000);
+    return;
+  }
+  
   try {
     await chrome.alarms.clear('processEmails');
     await chrome.alarms.create('processEmails', { periodInMinutes: 15 });
+    console.log('AgileEmails: Successfully scheduled processEmails alarm');
   } catch (err) {
-    console.error('Error scheduling processEmails alarm:', err);
+    console.error('AgileEmails: Error scheduling processEmails alarm:', err);
   }
 }
 
@@ -50,17 +63,21 @@ chrome.runtime.onStartup.addListener(async () => {
 // ===============================
 // ALARM HANDLING
 // ===============================
-chrome.alarms.onAlarm.addListener((alarm) => {
-  try {
-    if (alarm?.name === 'processEmails') {
-      processEmails();
-    } else if (alarm?.name?.startsWith('autoDelete-')) {
-      handleAutoDelete(alarm.name);
+if (chrome && chrome.alarms && chrome.alarms.onAlarm) {
+  chrome.alarms.onAlarm.addListener((alarm) => {
+    try {
+      if (alarm?.name === 'processEmails') {
+        processEmails();
+      } else if (alarm?.name?.startsWith('autoDelete-')) {
+        handleAutoDelete(alarm.name);
+      }
+    } catch (err) {
+      console.error('AgileEmails: Alarm processing error:', err);
     }
-  } catch (err) {
-    console.error('Alarm processing error:', err);
-  }
-});
+  });
+} else {
+  console.warn('AgileEmails: chrome.alarms.onAlarm not available');
+}
 
 // ===============================
 // PROCESS EMAILS (CONTENT SCRIPT)
