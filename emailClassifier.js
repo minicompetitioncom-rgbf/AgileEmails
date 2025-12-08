@@ -312,6 +312,23 @@ class EmailClassifier {
       }
     }
 
+    // Check if email is personalized (not a mass email/newsletter)
+    const body = email.body?.toLowerCase() || '';
+    const fullText = `${subject} ${body}`.toLowerCase();
+    const hasUnsubscribe = fullText.includes('unsubscribe') || 
+                          fullText.includes('unsub') || 
+                          from.includes('noreply') || 
+                          from.includes('no-reply') ||
+                          from.includes('donotreply');
+    
+    // Personalized emails (no unsubscribe, not automated) should be at least priority 4
+    const isPersonalized = !hasUnsubscribe && 
+                          !email.isNonHuman && 
+                          !isNewsletter && 
+                          bestCategory !== 'other' &&
+                          bestCategory !== 'promo' &&
+                          bestCategory !== 'auth-codes';
+    
     // Adjust priority based on urgency (subject only for speed)
     const subjectUrgent = this.urgentKeywords.some(kw => subject.includes(kw.toLowerCase()));
     const subjectImportant = this.importantKeywords.some(kw => subject.includes(kw.toLowerCase()));
@@ -320,6 +337,11 @@ class EmailClassifier {
     if (email.isNonHuman || bestCategory === 'other') {
       priority = 1;
     } else {
+      // Personalized emails without unsubscribe get priority 4 minimum
+      if (isPersonalized && priority < 4) {
+        priority = 4;
+      }
+      
       // Urgent keywords can boost to 5, but maintain distribution for others
       if (subjectUrgent) {
         priority = 5; // Urgent always gets highest priority
@@ -336,8 +358,8 @@ class EmailClassifier {
         priority = Math.min(4, priority + 0.3);
       }
       
-      // Ensure priority stays in 2-4 range for normal emails (unless urgent)
-      if (!subjectUrgent && priority < 2) {
+      // Ensure priority stays in 2-4 range for normal emails (unless urgent or personalized)
+      if (!subjectUrgent && !isPersonalized && priority < 2) {
         priority = 2; // Minimum 2 for categorized emails
       }
     }
