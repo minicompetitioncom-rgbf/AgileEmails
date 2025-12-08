@@ -4,70 +4,90 @@ class EmailClassifier {
   constructor() {
     this.categories = {
       'school': {
+        // Keywords ranked by importance (most important first)
         keywords: [
-          'university', 'universities', 'college', 'colleges', 'professor', 'professors', 'prof', 'assignment', 'assignments', 'homework', 'course', 'courses',
-          'syllabus', 'syllabi', 'campus', 'edu', 'education', 'student', 'students', 'class', 'classes', 'lecture', 'lectures',
-          'exam', 'exams', 'test', 'tests', 'quiz', 'quizzes', 'midterm', 'midterms', 'final', 'finals', 'grade', 'grades', 'gpa',
-          'registration', 'registrations', 'enrollment', 'enrollments', 'tuition', 'financial aid', 'scholarship', 'scholarships',
-          'blackboard', 'canvas', 'moodle', 'coursework', 'due date', 'due dates', 'submission', 'submissions'
+          // Highest priority: exams, deadlines, assignments
+          'due date', 'due dates', 'deadline', 'deadlines', 'exam', 'exams', 'test', 'tests', 'quiz', 'quizzes', 'midterm', 'midterms', 'final', 'finals',
+          'assignment', 'assignments', 'homework', 'submission', 'submissions',
+          // High priority: grades, courses, classes
+          'grade', 'grades', 'gpa', 'course', 'courses', 'class', 'classes', 'lecture', 'lectures', 'professor', 'professors', 'prof',
+          // Medium priority: enrollment, registration
+          'registration', 'registrations', 'enrollment', 'enrollments', 'student', 'students', 'education', 'edu',
+          // Lower priority: general school terms
+          'university', 'universities', 'college', 'colleges', 'campus', 'tuition', 'financial aid', 'scholarship', 'scholarships',
+          'blackboard', 'canvas', 'moodle', 'coursework', 'syllabus', 'syllabi'
         ],
         domains: ['edu', 'school', 'university', 'college'],
         priority: 3
       },
       'work-current': {
+        // Keywords ranked by importance (most important first)
         keywords: [
-          'team', 'teams', 'meeting', 'meetings', 'project', 'projects', 'deadline', 'deadlines', 'urgent', 'asap', 'standup', 'standups', 'sprint', 'sprints',
-          'stand-up', 'stand-ups', 'stand up', 'stand ups', 'sync', 'syncs', 'sync up', 'sync ups', '1:1', 'one-on-one', 'one on one',
-          'review', 'reviews', 'code review', 'code reviews', 'pr review', 'pr reviews', 'pull request', 'pull requests', 'merge', 'merges', 'deploy', 'deploys',
-          'sprint planning', 'sprint plannings', 'retrospective', 'retrospectives', 'retro', 'retros', 'all hands', 'all-hands',
-          'slack', 'jira', 'confluence', 'trello', 'asana', 'notion',
-          'follow up', 'follow-ups', 'follow-up', 'follow ups', 'action items', 'action item', 'todo', 'todos', 'to-do', 'to-dos'
+          // Highest priority: urgent, deadlines, action items
+          'deadline', 'deadlines', 'urgent', 'asap', 'action items', 'action item', 'action required', 'action needed',
+          'follow up', 'follow-ups', 'follow-up', 'follow ups', 'todo', 'todos', 'to-do', 'to-dos',
+          // High priority: meetings, projects, reviews
+          'meeting', 'meetings', 'project', 'projects', 'review', 'reviews', 'code review', 'code reviews', 'pr review', 'pr reviews',
+          'pull request', 'pull requests', 'merge', 'merges', 'deploy', 'deploys',
+          // Medium priority: team syncs, planning
+          'team', 'teams', 'sync', 'syncs', 'sync up', 'sync ups', '1:1', 'one-on-one', 'one on one',
+          'sprint planning', 'sprint plannings', 'sprint', 'sprints', 'standup', 'standups', 'stand-up', 'stand-ups', 'stand up', 'stand ups',
+          // Lower priority: tools, retrospectives
+          'retrospective', 'retrospectives', 'retro', 'retros', 'all hands', 'all-hands',
+          'slack', 'jira', 'confluence', 'trello', 'asana', 'notion'
         ],
         priority: 4
       },
       'work-opportunities': {
+        // Keywords ranked by importance (most important first)
         keywords: [
-          'opportunity', 'opportunities', 'job', 'jobs', 'position', 'positions', 'recruiter', 'recruiters', 'hiring', 'career', 'careers', 'interview', 'interviews', 'linkedin',
-          'job opening', 'job openings', 'job opportunity', 'job opportunities', 'we are hiring', 'we\'re hiring', 'hiring now',
-          'apply now', 'application', 'applications', 'resume', 'resumes', 'cv', 'cvs', 'curriculum vitae',
+          // Highest priority: interviews, applications, job openings
+          'interview', 'interviews', 'apply now', 'application', 'applications', 'job opening', 'job openings', 'job opportunity', 'job opportunities',
+          // High priority: recruiters, hiring, positions
+          'recruiter', 'recruiters', 'hiring', 'we are hiring', 'we\'re hiring', 'hiring now', 'position', 'positions', 'job', 'jobs',
+          // Medium priority: career, opportunity
+          'opportunity', 'opportunities', 'career', 'careers', 'resume', 'resumes', 'cv', 'cvs', 'curriculum vitae',
+          // Lower priority: job sites, general terms
           'recruiting', 'talent', 'talents', 'headhunter', 'headhunters', 'recruitment', 'recruitments', 'job search', 'job searches',
-          'indeed', 'glassdoor', 'monster', 'ziprecruiter', 'angel.co', 'angelist'
+          'linkedin', 'indeed', 'glassdoor', 'monster', 'ziprecruiter', 'angel.co', 'angelist'
         ],
         priority: 3
       },
       'finance': {
+        // Keywords ranked by importance (most important first)
         keywords: [
-          // Payments & transactions
-          'payment', 'payments', 'invoice', 'invoices', 'receipt', 'receipts', 'transaction', 'transactions', 'purchase', 'purchases', 'charge', 'charges', 'charged',
-          // Bank & accounts
-          'bank', 'banks', 'banking', 'account', 'accounts', 'checking', 'savings', 'deposit', 'deposits', 'withdrawal', 'withdrawals', 'transfer', 'transfers',
-          // Credit cards
-          'credit card', 'credit cards', 'creditcard', 'creditcards', 'card ending', 'card endings', 'card number', 'card numbers', 'expires',
-          // Statements & balances
+          // Highest priority: urgent financial matters
+          'payment due', 'payments due', 'overdue', 'past due', 'amount due', 'amounts due', 'balance due', 'balances due', 'minimum payment', 'minimum payments',
+          'alert', 'alerts', 'notification', 'notifications', 'reminder', 'reminders', 'payment reminder', 'payment reminders',
+          // High priority: invoices, receipts, charges
+          'invoice', 'invoices', 'receipt', 'receipts', 'charge', 'charges', 'charged', 'payment', 'payments', 'transaction', 'transactions',
+          // Medium priority: statements, balances, accounts
           'statement', 'statements', 'balance', 'balances', 'account balance', 'account balances', 'available balance', 'available balances', 'account summary', 'account summaries',
-          // Money amounts
-          '$', 'dollar', 'dollars', 'amount due', 'amounts due', 'balance due', 'balances due', 'payment due', 'payments due', 'minimum payment', 'minimum payments',
-          // Subscriptions
+          'account', 'accounts', 'purchase', 'purchases', '$', 'dollar', 'dollars',
+          // Lower priority: subscriptions, bills, services
           'subscription', 'subscriptions', 'renewal', 'renewals', 'renew', 'billing', 'billed', 'monthly', 'annual', 'yearly',
           'subscription fee', 'subscription fees', 'membership', 'memberships', 'auto-renew', 'auto renew',
-          // Financial services
+          'bill', 'bills', 'utility', 'utilities', 'electric', 'gas', 'water', 'phone bill', 'phone bills', 'internet bill', 'internet bills',
+          'credit card', 'credit cards', 'creditcard', 'creditcards', 'card ending', 'card endings', 'card number', 'card numbers', 'expires',
+          'bank', 'banks', 'banking', 'checking', 'savings', 'deposit', 'deposits', 'withdrawal', 'withdrawals', 'transfer', 'transfers',
           'paypal', 'stripe', 'venmo', 'zelle', 'cash app', 'square', 'chase', 'bank of america',
-          'wells fargo', 'citi', 'american express', 'amex', 'discover', 'capital one',
-          // Bills & utilities
-          'bill', 'bills', 'billing', 'utility', 'utilities', 'electric', 'gas', 'water', 'phone bill', 'phone bills', 'internet bill', 'internet bills',
-          // Financial alerts
-          'alert', 'alerts', 'notification', 'notifications', 'reminder', 'reminders', 'payment reminder', 'payment reminders', 'overdue', 'past due'
+          'wells fargo', 'citi', 'american express', 'amex', 'discover', 'capital one'
         ],
         domains: ['bank', 'paypal', 'stripe', 'chase', 'wellsfargo', 'bofa', 'citi', 'amex', 
                   'discover', 'capitalone', 'venmo', 'square', 'billing', 'invoice', 'payment'],
         priority: 4
       },
       'personal': {
+        // Keywords ranked by importance (most important first)
         keywords: [
-          'family', 'families', 'friend', 'friends', 'birthday', 'birthdays', 'party', 'parties', 'weekend', 'weekends', 'dinner', 'dinners',
-          'lunch', 'lunches', 'brunch', 'brunches', 'coffee', 'drinks', 'happy hour', 'happy hours', 'celebration', 'celebrations',
-          'congratulations', 'congrats', 'wedding', 'weddings', 'baby', 'babies', 'shower', 'showers', 'anniversary', 'anniversaries',
-          'holiday', 'holidays', 'vacation', 'vacations', 'trip', 'trips', 'travel', 'weekend plans', 'get together', 'get togethers',
+          // Highest priority: special events
+          'birthday', 'birthdays', 'wedding', 'weddings', 'anniversary', 'anniversaries', 'celebration', 'celebrations',
+          'congratulations', 'congrats', 'baby', 'babies', 'shower', 'showers',
+          // Medium priority: social gatherings
+          'party', 'parties', 'dinner', 'dinners', 'lunch', 'lunches', 'brunch', 'brunches', 'coffee', 'drinks', 'happy hour', 'happy hours',
+          'weekend plans', 'get together', 'get togethers',
+          // Lower priority: general social
+          'family', 'families', 'friend', 'friends', 'weekend', 'weekends', 'holiday', 'holidays', 'vacation', 'vacations', 'trip', 'trips', 'travel',
           'catch up', 'catch ups', 'hang out', 'hang outs', 'hangout', 'hangouts'
         ],
         priority: 2
@@ -156,6 +176,18 @@ class EmailClassifier {
       bestCategory = quickResult.category;
       bestScore = quickResult.score;
       priority = quickResult.priority;
+      // Use keyword rank from quick result if available
+      if (quickResult.keywordRank !== undefined) {
+        const totalKeywords = this.categories[bestCategory]?.keywords?.length || 100;
+        const rankPercent = quickResult.keywordRank / totalKeywords;
+        if (rankPercent < 0.2) {
+          priority = 4;
+        } else if (rankPercent < 0.5) {
+          priority = 3;
+        } else if (rankPercent < 0.8) {
+          priority = 2;
+        }
+      }
     } else {
       // Not confident enough, need to check body progressively
       const body = email.body?.toLowerCase() || '';
@@ -164,10 +196,23 @@ class EmailClassifier {
       // Try with first line of body
       if (bodyLines.length > 0) {
         const firstLineResult = this.classifyWithText(from, subject, bodyLines[0], emailDomain, senderName);
-        if (firstLineResult.score > bestScore) {
+        if (firstLineResult.score > bestScore || 
+            (firstLineResult.score === bestScore && firstLineResult.keywordRank < (quickResult.keywordRank || Infinity))) {
           bestCategory = firstLineResult.category;
           bestScore = firstLineResult.score;
           priority = firstLineResult.priority;
+          // Apply rank-based priority adjustment
+          if (firstLineResult.keywordRank !== undefined) {
+            const totalKeywords = this.categories[bestCategory]?.keywords?.length || 100;
+            const rankPercent = firstLineResult.keywordRank / totalKeywords;
+            if (rankPercent < 0.2) {
+              priority = 4;
+            } else if (rankPercent < 0.5) {
+              priority = 3;
+            } else if (rankPercent < 0.8) {
+              priority = 2;
+            }
+          }
         }
       }
       
@@ -179,6 +224,17 @@ class EmailClassifier {
           bestCategory = twoLinesResult.category;
           bestScore = twoLinesResult.score;
           priority = twoLinesResult.priority;
+          if (twoLinesResult.keywordRank !== undefined) {
+            const totalKeywords = this.categories[bestCategory]?.keywords?.length || 100;
+            const rankPercent = twoLinesResult.keywordRank / totalKeywords;
+            if (rankPercent < 0.2) {
+              priority = 4;
+            } else if (rankPercent < 0.5) {
+              priority = 3;
+            } else if (rankPercent < 0.8) {
+              priority = 2;
+            }
+          }
         }
       }
       
@@ -190,6 +246,17 @@ class EmailClassifier {
           bestCategory = threeLinesResult.category;
           bestScore = threeLinesResult.score;
           priority = threeLinesResult.priority;
+          if (threeLinesResult.keywordRank !== undefined) {
+            const totalKeywords = this.categories[bestCategory]?.keywords?.length || 100;
+            const rankPercent = threeLinesResult.keywordRank / totalKeywords;
+            if (rankPercent < 0.2) {
+              priority = 4;
+            } else if (rankPercent < 0.5) {
+              priority = 3;
+            } else if (rankPercent < 0.8) {
+              priority = 2;
+            }
+          }
         }
       }
       
@@ -200,6 +267,17 @@ class EmailClassifier {
           bestCategory = fullBodyResult.category;
           bestScore = fullBodyResult.score;
           priority = fullBodyResult.priority;
+          if (fullBodyResult.keywordRank !== undefined) {
+            const totalKeywords = this.categories[bestCategory]?.keywords?.length || 100;
+            const rankPercent = fullBodyResult.keywordRank / totalKeywords;
+            if (rankPercent < 0.2) {
+              priority = 4;
+            } else if (rankPercent < 0.5) {
+              priority = 3;
+            } else if (rankPercent < 0.8) {
+              priority = 2;
+            }
+          }
         }
       }
     }
@@ -208,22 +286,29 @@ class EmailClassifier {
     const subjectUrgent = this.urgentKeywords.some(kw => subject.includes(kw.toLowerCase()));
     const subjectImportant = this.importantKeywords.some(kw => subject.includes(kw.toLowerCase()));
     
-    if (subjectUrgent) {
-      priority = Math.min(5, priority + 2);
-    } else if (subjectImportant) {
-      priority = Math.min(5, priority + 1);
-    }
-
     // Automated/non-human emails should always be priority 1 (low urgency for replies)
     if (email.isNonHuman || bestCategory === 'other') {
       priority = 1;
     } else {
-      // Only boost priority if it's not "other" category
-      if (email.unread) {
-        priority = Math.min(5, priority + 0.5);
+      // Urgent keywords can boost to 5, but maintain distribution for others
+      if (subjectUrgent) {
+        priority = 5; // Urgent always gets highest priority
+      } else if (subjectImportant) {
+        // Important keywords boost by 1, but cap at 4 to maintain distribution
+        priority = Math.min(4, priority + 1);
       }
-      if (bestCategory === 'finance' && /\$[\d,]+\.?\d*/.test(subject)) {
-        priority = Math.min(5, priority + 0.5);
+      
+      // Minor boosts for unread and money amounts (but keep in 2-4 range)
+      if (email.unread && priority < 4) {
+        priority = Math.min(4, priority + 0.3);
+      }
+      if (bestCategory === 'finance' && /\$[\d,]+\.?\d*/.test(subject) && priority < 4) {
+        priority = Math.min(4, priority + 0.3);
+      }
+      
+      // Ensure priority stays in 2-4 range for normal emails (unless urgent)
+      if (!subjectUrgent && priority < 2) {
+        priority = 2; // Minimum 2 for categorized emails
       }
     }
 
@@ -247,6 +332,7 @@ class EmailClassifier {
   classifyWithText(from, subject, bodyText, emailDomain, senderName) {
     let bestCategory = 'other';
     let bestScore = 0;
+    let bestKeywordRank = Infinity; // Lower rank = more important
     let priority = 1;
     const text = `${from} ${subject} ${bodyText}`;
 
@@ -254,6 +340,7 @@ class EmailClassifier {
       if (category === 'auth-codes' || category === 'promo') continue;
       
       let score = 0;
+      let bestMatchedRank = Infinity; // Track the best (lowest) rank of matched keywords
 
       // Check domains first (strongest signal, no body needed)
       if (config.domains && config.domains.length > 0) {
@@ -263,39 +350,92 @@ class EmailClassifier {
         });
         if (domainMatch) {
           score += 10; // Domain match is very strong
+          bestMatchedRank = 0; // Domain match is highest priority
         }
       }
 
-      // Check keywords in subject (high weight, no body needed)
+      // Check keywords with rank-based scoring (earlier in list = more important)
       if (config.keywords && Array.isArray(config.keywords) && config.keywords.length > 0) {
-        const subjectMatches = config.keywords.filter(kw => 
-          kw && typeof kw === 'string' && subject.includes(kw.toLowerCase())
-        ).length;
-        score += subjectMatches * 3; // Subject matches worth 3x
+        config.keywords.forEach((kw, index) => {
+          if (!kw || typeof kw !== 'string') return;
+          const lowerKw = kw.toLowerCase();
+          let matched = false;
+          let rankWeight = 0;
 
-        // Check sender name
-        const senderMatches = config.keywords.filter(kw => 
-          kw && typeof kw === 'string' && senderName.includes(kw.toLowerCase())
-        ).length;
-        score += senderMatches * 2;
+          // Subject matches (highest weight, and check rank)
+          if (subject.includes(lowerKw)) {
+            matched = true;
+            // Earlier keywords (lower index) get higher weight
+            // First 20% of keywords = 5x, next 30% = 3x, rest = 2x
+            const keywordPercent = index / config.keywords.length;
+            if (keywordPercent < 0.2) {
+              rankWeight = 5;
+            } else if (keywordPercent < 0.5) {
+              rankWeight = 3;
+            } else {
+              rankWeight = 2;
+            }
+            score += rankWeight;
+            if (index < bestMatchedRank) {
+              bestMatchedRank = index;
+            }
+          }
 
-        // Only check body if provided
-        if (bodyText) {
-          const bodyMatches = config.keywords.filter(kw => 
-            kw && typeof kw === 'string' && bodyText.includes(kw.toLowerCase())
-          ).length;
-          score += bodyMatches * 2;
-        }
+          // Sender name matches (medium weight)
+          if (senderName.includes(lowerKw)) {
+            matched = true;
+            const keywordPercent = index / config.keywords.length;
+            const rankWeight = keywordPercent < 0.3 ? 2 : 1;
+            score += rankWeight;
+            if (index < bestMatchedRank) {
+              bestMatchedRank = index;
+            }
+          }
+
+          // Body matches (lower weight, only if provided)
+          if (bodyText && bodyText.includes(lowerKw)) {
+            matched = true;
+            const keywordPercent = index / config.keywords.length;
+            const rankWeight = keywordPercent < 0.3 ? 2 : 1;
+            score += rankWeight;
+            if (index < bestMatchedRank) {
+              bestMatchedRank = index;
+            }
+          }
+        });
       }
 
-      if (score > bestScore) {
+      if (score > bestScore || (score === bestScore && bestMatchedRank < bestKeywordRank)) {
         bestScore = score;
         bestCategory = category;
+        bestKeywordRank = bestMatchedRank;
         priority = config.priority || 1;
       }
     }
 
-    return { category: bestCategory, score: bestScore, priority };
+    // Adjust priority based on keyword rank for better distribution across 2-4
+    // Lower rank (earlier in list) = higher priority boost
+    if (bestKeywordRank < Infinity && bestCategory !== 'other') {
+      const totalKeywords = this.categories[bestCategory]?.keywords?.length || 100;
+      const rankPercent = bestKeywordRank / totalKeywords;
+      
+      // Create more even distribution:
+      // Top 20% keywords -> priority 4
+      // Next 30% keywords -> priority 3
+      // Next 30% keywords -> priority 2
+      // Bottom 20% keywords -> priority 2 (or keep base)
+      if (rankPercent < 0.2) {
+        priority = 4;
+      } else if (rankPercent < 0.5) {
+        priority = 3;
+      } else if (rankPercent < 0.8) {
+        priority = 2;
+      } else {
+        priority = Math.max(2, priority); // Keep at least 2 for categorized emails
+      }
+    }
+
+    return { category: bestCategory, score: bestScore, priority, keywordRank: bestKeywordRank };
   }
 
   // Quick non-human check using only sender and subject
