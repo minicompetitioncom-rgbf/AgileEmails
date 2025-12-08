@@ -468,10 +468,16 @@ function applyVisualIndicators(emails, settings) {
       
       // Check if visual indicators are enabled
       if (settings.settings?.showPriorityColors !== false) {
-        // Add priority color border (thicker for higher priority)
+        // Add priority color border (thicker for higher priority, more vibrant colors)
         const priorityColor = classifier.getPriorityColor(data.priority);
         const borderWidth = data.priority >= 4 ? '6px' : data.priority >= 3 ? '4px' : '2px';
         element.style.borderLeft = `${borderWidth} solid ${priorityColor}`;
+        // Add subtle background tint for better visibility
+        if (data.priority >= 4) {
+          element.style.backgroundColor = `rgba(${data.priority === 5 ? '255, 0, 0' : '255, 140, 0'}, 0.08)`;
+        } else if (data.priority === 3) {
+          element.style.backgroundColor = 'rgba(255, 215, 0, 0.06)';
+        }
       }
       
       // Create overlay with urgency info
@@ -487,11 +493,10 @@ function applyVisualIndicators(emails, settings) {
         1: 'LOW'
       };
       
-      // Build overlay content
+      // Build overlay content - priority indicator on left, just number
       let overlayHTML = `
-        <div class="agileemails-priority-indicator" style="background-color: ${priorityColor}">
-          <span class="agileemails-priority-number">${data.priority}</span>
-          <span class="agileemails-priority-label">${priorityLabels[data.priority] || 'MEDIUM'}</span>
+        <div class="agileemails-priority-indicator-left" style="background-color: ${priorityColor}">
+          <span class="agileemails-priority-number-only">${data.priority}</span>
         </div>
       `;
       
@@ -538,9 +543,26 @@ function applyVisualIndicators(emails, settings) {
       // Store email ID on the element for easier lookup
       element.setAttribute('data-agileemails-id', data.id);
       
-      // Insert overlay - try to find a good position in the row
-      // Gmail rows typically have cells, so we'll append to the row itself
-      element.appendChild(overlay);
+      // Insert priority indicator on the left side of the row
+      const firstCell = element.querySelector('td:first-child') || element.querySelector('div:first-child') || element.firstElementChild;
+      const priorityIndicator = overlay.querySelector('.agileemails-priority-indicator-left');
+      
+      if (firstCell && priorityIndicator) {
+        // Remove existing priority indicator if any
+        const existingPriority = firstCell.querySelector('.agileemails-priority-indicator-left');
+        if (existingPriority) {
+          existingPriority.remove();
+        }
+        // Insert priority indicator as first child of first cell
+        firstCell.insertBefore(priorityIndicator, firstCell.firstChild);
+      }
+      
+      // Append rest of overlay to row (for category badges, etc. on right side)
+      if (overlay.children.length > 0) {
+        element.appendChild(overlay);
+      } else {
+        overlay.remove();
+      }
       
       // Ensure the row has relative positioning for absolute overlay
       if (getComputedStyle(element).position === 'static') {
@@ -789,11 +811,17 @@ function applyOverlayToElement(element, emailData, settings) {
     element.classList.remove('agileemails-priority-5', 'agileemails-priority-4', 'agileemails-priority-3', 'agileemails-priority-2', 'agileemails-priority-1');
     element.classList.add(`agileemails-priority-${emailData.priority}`);
     
-    // Add border
+    // Add border with more vibrant colors
     if (settings.settings?.showPriorityColors !== false) {
       const priorityColor = classifier.getPriorityColor(emailData.priority);
       const borderWidth = emailData.priority >= 4 ? '6px' : emailData.priority >= 3 ? '4px' : '2px';
       element.style.borderLeft = `${borderWidth} solid ${priorityColor}`;
+      // Add subtle background tint for better visibility
+      if (emailData.priority >= 4) {
+        element.style.backgroundColor = `rgba(${emailData.priority === 5 ? '255, 0, 0' : '255, 140, 0'}, 0.08)`;
+      } else if (emailData.priority === 3) {
+        element.style.backgroundColor = 'rgba(255, 215, 0, 0.06)';
+      }
     }
     
     // Create overlay
@@ -810,10 +838,10 @@ function applyOverlayToElement(element, emailData, settings) {
       1: 'LOW'
     };
     
+    // Priority indicator on left, just number
     let overlayHTML = `
-      <div class="agileemails-priority-indicator" style="background-color: ${priorityColor}">
-        <span class="agileemails-priority-number">${emailData.priority}</span>
-        <span class="agileemails-priority-label">${priorityLabels[emailData.priority] || 'MEDIUM'}</span>
+      <div class="agileemails-priority-indicator-left" style="background-color: ${priorityColor}">
+        <span class="agileemails-priority-number-only">${emailData.priority}</span>
       </div>
     `;
     
@@ -856,7 +884,26 @@ function applyOverlayToElement(element, emailData, settings) {
     // Store email ID on element for easier lookup
     element.setAttribute('data-agileemails-id', emailData.id);
     
-    element.appendChild(overlay);
+    // Insert priority indicator on the left side
+    const firstCell = element.querySelector('td:first-child') || element.querySelector('div:first-child') || element.firstElementChild;
+    const priorityIndicator = overlay.querySelector('.agileemails-priority-indicator-left');
+    
+    if (firstCell && priorityIndicator) {
+      // Remove existing priority indicator if any
+      const existingPriority = firstCell.querySelector('.agileemails-priority-indicator-left');
+      if (existingPriority) {
+        existingPriority.remove();
+      }
+      // Insert priority indicator as first child of first cell
+      firstCell.insertBefore(priorityIndicator, firstCell.firstChild);
+    }
+    
+    // Append rest of overlay to row (for category badges, etc. on right side)
+    if (overlay.children.length > 0) {
+      element.appendChild(overlay);
+    } else {
+      overlay.remove();
+    }
     
     // Ensure relative positioning
     if (getComputedStyle(element).position === 'static') {

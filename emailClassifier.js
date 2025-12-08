@@ -149,6 +149,21 @@ class EmailClassifier {
       };
     }
 
+    // Check for privacy policy emails (low priority) - check subject first
+    const privacyKeywords = ['privacy policy', 'privacy notice', 'privacy update', 'privacy changes', 
+                             'terms of service', 'terms and conditions', 'legal notice', 'legal update'];
+    const hasPrivacyKeyword = privacyKeywords.some(kw => subject.includes(kw.toLowerCase()));
+    
+    if (hasPrivacyKeyword || from.includes('privacy') || from.includes('legal')) {
+      return {
+        category: 'other',
+        priority: 1,
+        isNewsletter: false,
+        confidence: 15,
+        isNonHuman: true
+      };
+    }
+
     // Check for auth codes (subject only)
     if (/\b\d{4,8}\b/.test(subject) && (subject.includes('code') || subject.includes('verify'))) {
       return {
@@ -262,6 +277,21 @@ class EmailClassifier {
       
       // Last resort: use full body (but we try to avoid this)
       if (bestScore < 3 && body.length > 0) {
+        // Check for privacy policy in body before classifying
+        const privacyKeywords = ['privacy policy', 'privacy notice', 'privacy update', 'privacy changes', 
+                                 'terms of service', 'terms and conditions', 'legal notice', 'legal update'];
+        const hasPrivacyKeyword = privacyKeywords.some(kw => body.includes(kw.toLowerCase()));
+        
+        if (hasPrivacyKeyword) {
+          return {
+            category: 'other',
+            priority: 1,
+            isNewsletter: false,
+            confidence: 15,
+            isNonHuman: true
+          };
+        }
+        
         const fullBodyResult = this.classifyWithText(from, subject, body, emailDomain, senderName);
         if (fullBodyResult.score > bestScore) {
           bestCategory = fullBodyResult.category;
@@ -506,12 +536,13 @@ class EmailClassifier {
   }
 
   getPriorityColor(priority) {
+    // More vibrant, saturated colors for better visibility
     const colors = {
-      5: '#FF0000', // Red - urgent
-      4: '#FF8C00', // Orange - high
-      3: '#FFD700', // Yellow - medium-high
-      2: '#90EE90', // Light green - medium
-      1: '#006400'  // Dark green - low
+      5: '#FF3333', // Bright red - urgent (more saturated)
+      4: '#FF6600', // Bright orange - high (more saturated)
+      3: '#FFCC00', // Bright yellow - medium-high (more saturated)
+      2: '#66CC66', // Medium green - medium (more saturated)
+      1: '#339933'  // Medium dark green - low (more saturated)
     };
     return colors[priority] || colors[1];
   }

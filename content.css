@@ -10,26 +10,49 @@
   vertical-align: middle;
 }
 
-/* Priority color borders */
+/* Priority color borders - more vibrant */
 tr[role="row"] {
   transition: border-left 0.2s ease;
   position: relative;
 }
 
-/* Priority-specific styling */
+/* Priority-specific styling - more visible colors */
 tr[role="row"].agileemails-priority-5 {
-  background-color: rgba(255, 0, 0, 0.05) !important;
+  background-color: rgba(255, 0, 0, 0.12) !important;
 }
 
 tr[role="row"].agileemails-priority-4 {
-  background-color: rgba(255, 140, 0, 0.05) !important;
+  background-color: rgba(255, 140, 0, 0.10) !important;
 }
 
 tr[role="row"].agileemails-priority-3 {
-  background-color: rgba(255, 215, 0, 0.03) !important;
+  background-color: rgba(255, 215, 0, 0.08) !important;
 }
 
-/* Overlay with urgency info */
+/* Priority indicator on left side - small box with just number */
+.agileemails-priority-indicator-left {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 20px !important;
+  height: 20px !important;
+  border-radius: 3px !important;
+  color: white !important;
+  font-weight: 900 !important;
+  font-size: 12px !important;
+  margin-right: 6px !important;
+  vertical-align: middle !important;
+  flex-shrink: 0 !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) !important;
+}
+
+.agileemails-priority-number-only {
+  font-size: 12px !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+}
+
+/* Overlay with other info (right side) */
 .agileemails-overlay {
   position: absolute !important;
   top: 2px !important;
@@ -50,28 +73,6 @@ tr[role="row"].agileemails-priority-3 {
   overflow: hidden;
   visibility: visible !important;
   opacity: 1 !important;
-}
-
-.agileemails-priority-indicator {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  padding: 2px 6px;
-  border-radius: 3px;
-  color: white;
-  font-weight: bold;
-  font-size: 9px;
-}
-
-.agileemails-priority-number {
-  font-size: 12px;
-  font-weight: 900;
-}
-
-.agileemails-priority-label {
-  font-size: 8px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
 }
 
 .agileemails-category-badge {
