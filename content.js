@@ -634,31 +634,6 @@ function applyVisualIndicators(emails, settings) {
         });
       }
       
-      // Also add priority badge next to subject for better visibility
-      if (settings.settings?.showCategoryBadges !== false) {
-        let subjectEl = element.querySelector('span.bog');
-        if (!subjectEl) {
-          subjectEl = element.querySelector('[data-thread-perm-id] span');
-        }
-        if (subjectEl && !subjectEl.querySelector('.agileemails-priority-badge')) {
-          const priorityBadge = document.createElement('span');
-          priorityBadge.className = 'agileemails-priority-badge';
-          priorityBadge.textContent = `P${data.priority}`;
-          priorityBadge.style.cssText = `
-            display: inline-block;
-            padding: 1px 4px;
-            margin-left: 6px;
-            font-size: 9px;
-            font-weight: bold;
-            border-radius: 2px;
-            background: ${priorityColor};
-            color: white;
-            vertical-align: middle;
-          `;
-          subjectEl.appendChild(priorityBadge);
-        }
-      }
-      
       // Hide if DND active
       if (data.isDND) {
         element.style.opacity = '0.3';
