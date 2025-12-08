@@ -151,10 +151,10 @@ class EmailClassifier {
 
     // Check for privacy policy emails (low priority) - check subject first
     const privacyKeywords = ['privacy policy', 'privacy notice', 'privacy update', 'privacy changes', 
-                             'terms of service', 'terms and conditions', 'legal notice', 'legal update'];
+                             'terms of service', 'terms and conditions'];
     const hasPrivacyKeyword = privacyKeywords.some(kw => subject.includes(kw.toLowerCase()));
     
-    if (hasPrivacyKeyword || from.includes('privacy') || from.includes('legal')) {
+    if (hasPrivacyKeyword || from.includes('privacy')) {
       return {
         category: 'other',
         priority: 1,
@@ -279,7 +279,7 @@ class EmailClassifier {
       if (bestScore < 3 && body.length > 0) {
         // Check for privacy policy in body before classifying
         const privacyKeywords = ['privacy policy', 'privacy notice', 'privacy update', 'privacy changes', 
-                                 'terms of service', 'terms and conditions', 'legal notice', 'legal update'];
+                                 'terms of service', 'terms and conditions'];
         const hasPrivacyKeyword = privacyKeywords.some(kw => body.includes(kw.toLowerCase()));
         
         if (hasPrivacyKeyword) {
