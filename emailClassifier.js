@@ -312,16 +312,95 @@ class EmailClassifier {
       }
     }
 
-    // Check if email is personalized (not a mass email/newsletter)
+    // Get full text for comprehensive checks
     const body = email.body?.toLowerCase() || '';
     const fullText = `${subject} ${body}`.toLowerCase();
-    const hasUnsubscribe = fullText.includes('unsubscribe') || 
-                          fullText.includes('unsub') || 
-                          from.includes('noreply') || 
-                          from.includes('no-reply') ||
-                          from.includes('donotreply');
     
-    // Personalized emails (no unsubscribe, not automated) should be at least priority 4
+    // RULE 1: Check for "unsubscribe" anywhere in email
+    const hasUnsubscribe = fullText.includes('unsubscribe') || fullText.includes('unsub');
+    
+    // RULE 3: Check for high-priority keywords (quiz, test, emergency, missed, important)
+    const highPriorityKeywords = {
+      'emergency': 5,  // Emergency = priority 5
+      'quiz': 4,       // Quiz = priority 4
+      'quizzes': 4,
+      'test': 4,       // Test = priority 4
+      'tests': 4,
+      'missed': 4,     // Missed = priority 4
+      'important': 4   // Important = priority 4
+    };
+    
+    let highPriorityBoost = 0;
+    let matchedHighPriorityKeyword = null;
+    
+    for (const [keyword, boostValue] of Object.entries(highPriorityKeywords)) {
+      if (fullText.includes(keyword)) {
+        highPriorityBoost = Math.max(highPriorityBoost, boostValue);
+        matchedHighPriorityKeyword = keyword;
+        break; // Use the highest priority match
+      }
+    }
+    
+    // RULE 1 & 4: Handle unsubscribe emails
+    if (hasUnsubscribe) {
+      // RULE 4: If unsubscribe + high-priority keyword, demote to priority 2
+      if (matchedHighPriorityKeyword) {
+        return {
+          category: bestCategory === 'other' ? 'promo' : bestCategory,
+          priority: 2,
+          isNewsletter: true,
+          confidence: bestScore || 15,
+          isNonHuman: false
+        };
+      }
+      
+      // Check if this is a news/newsletter source
+      const isNewsSource = this.isNewsSource(from, emailDomain, subject, body);
+      if (isNewsSource) {
+        // Check for breaking news keywords
+        const breakingNewsKeywords = ['breaking news', 'breaking', 'urgent news', 'alert', 'breaking story', 'just in'];
+        const isBreakingNews = breakingNewsKeywords.some(kw => fullText.includes(kw));
+        
+        return {
+          category: 'promo',
+          priority: isBreakingNews ? 2 : 1, // Breaking news = 2, regular news = 1
+          isNewsletter: true,
+          confidence: 20,
+          isNonHuman: false
+        };
+      }
+      
+      // Regular unsubscribe email = priority 1
+      return {
+        category: bestCategory === 'other' ? 'promo' : bestCategory,
+        priority: 1,
+        isNewsletter: true,
+        confidence: bestScore || 15,
+        isNonHuman: false
+      };
+    }
+    
+    // RULE 2: Detect news/newsletters (without unsubscribe)
+    const isNewsSource = this.isNewsSource(from, emailDomain, subject, body);
+    if (isNewsSource) {
+      const breakingNewsKeywords = ['breaking news', 'breaking', 'urgent news', 'alert', 'breaking story', 'just in'];
+      const isBreakingNews = breakingNewsKeywords.some(kw => fullText.includes(kw));
+      
+      return {
+        category: 'promo',
+        priority: isBreakingNews ? 2 : 1, // Breaking news = 2, regular news = 1
+        isNewsletter: true,
+        confidence: 15,
+        isNonHuman: false
+      };
+    }
+    
+    // RULE 3: Apply high-priority keyword boost (only if no unsubscribe)
+    if (matchedHighPriorityKeyword) {
+      priority = highPriorityBoost;
+    }
+    
+    // Check if email is personalized (not a mass email/newsletter)
     const isPersonalized = !hasUnsubscribe && 
                           !email.isNonHuman && 
                           !isNewsletter && 
@@ -336,7 +415,8 @@ class EmailClassifier {
     // Automated/non-human emails should always be priority 1 (low urgency for replies)
     if (email.isNonHuman || bestCategory === 'other') {
       priority = 1;
-    } else {
+    } else if (!matchedHighPriorityKeyword) {
+      // Only apply these rules if we haven't already set priority via high-priority keywords
       // Personalized emails without unsubscribe get priority 4 minimum
       if (isPersonalized && priority < 4) {
         priority = 4;
@@ -549,6 +629,41 @@ class EmailClassifier {
     const from = email.from?.toLowerCase() || '';
     const subject = email.subject?.toLowerCase() || '';
     return this.isNewsletterQuick(from, subject);
+  }
+
+  // Check if email is from a news source (newspaper, news website, etc.)
+  isNewsSource(from, emailDomain, subject, body) {
+    const newsDomains = [
+      'nytimes.com', 'wsj.com', 'washingtonpost.com', 'usatoday.com',
+      'cnn.com', 'bbc.com', 'reuters.com', 'ap.org', 'bloomberg.com',
+      'theguardian.com', 'npr.org', 'abc.com', 'cbs.com', 'nbc.com',
+      'foxnews.com', 'msnbc.com', 'cnbc.com', 'forbes.com', 'time.com',
+      'news', 'newspaper', 'newsletter', 'breaking', 'alert'
+    ];
+    
+    const newsKeywords = [
+      'newsletter', 'daily news', 'breaking news', 'news update',
+      'morning briefing', 'evening briefing', 'news digest', 'news roundup'
+    ];
+    
+    const fullText = `${from} ${subject} ${body}`.toLowerCase();
+    
+    // Check domain
+    if (newsDomains.some(domain => emailDomain.includes(domain))) {
+      return true;
+    }
+    
+    // Check keywords in subject or body
+    if (newsKeywords.some(kw => fullText.includes(kw))) {
+      return true;
+    }
+    
+    // Check sender name for news-related terms
+    if (from.includes('news') || from.includes('newsletter') || from.includes('breaking')) {
+      return true;
+    }
+    
+    return false;
   }
 
   adjustPriorityByHistory(email, currentPriority) {
